@@ -32,6 +32,20 @@ class NoteSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 
+class NoteHyperlinkedSerializer(serializers.HyperlinkedModelSerializer):
+	url = serializers.HyperlinkedIdentityField(
+		view_name='all-note-detail',
+	)
+	owner = serializers.HyperlinkedRelatedField(
+		view_name = 'user-detail',
+		queryset = User.objects.all(),
+	)
+
+	class Meta:
+		model = Note
+		fields = ['url', 'id', 'title', 'text', 'owner', 'created_on']
+
+
 class MyNoteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Note
