@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, generics
 from rest_framework.throttling import AnonRateThrottle
 from django_filters import rest_framework as django_filters
 from django.contrib.auth.models import User
@@ -46,3 +46,8 @@ class UserViewSet(viewsets.ModelViewSet):
 			self.throttle_classes.append(GetRateThrottle)
 
 		return super().get_throttles()
+
+
+class MyNoteViewSet(NoteViewSet):
+	def get_queryset(self):
+	    return self.request.user.notes.all()
