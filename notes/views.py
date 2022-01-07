@@ -1,10 +1,11 @@
 from rest_framework import viewsets, permissions, filters
 from rest_framework.throttling import AnonRateThrottle
 from django_filters import rest_framework as django_filters
+from django.contrib.auth.models import User
 from .models import Note
-from .serializers import NoteSerializer
+from .serializers import UserSerializer, NoteSerializer
 from .throttlers import GetRateThrottle, PostRateThrottle
-from .paginators import NoteResultsSetPagination
+from .paginators import UserResultsSetPagination, NoteResultsSetPagination
 from .filters import NoteFilter
 
 
@@ -18,6 +19,25 @@ class NoteViewSet(viewsets.ModelViewSet):
 	filterset_class = NoteFilter
 	search_fields = ['$title', '=owner__username']
 	ordering_fields = ['title', 'owner__username', 'created_on']
+
+	def get_throttles(self):
+		if self.action in ['update', 'partial_update', 'destroy']:
+			self.throttle_classes.append(PostRateThrottle)
+		else:
+			self.throttle_classes.append(GetRateThrottle)
+
+		return super().get_throttles()
+
+
+class UserViewSet(viewsets.ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = UserSerializer
+	permission_classes = [permissions.IsAdminUser]
+	throttle_classes = [AnonRateThrottle]
+	pagination_class = UserResultsSetPagination
+	filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+	search_fields = ['$owner__username']
+	ordering_fields = ['owner__username']
 
 	def get_throttles(self):
 		if self.action in ['update', 'partial_update', 'destroy']:
