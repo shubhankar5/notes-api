@@ -36,8 +36,8 @@ class UserViewSet(viewsets.ModelViewSet):
 	throttle_classes = [AnonRateThrottle]
 	pagination_class = UserResultsSetPagination
 	filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-	search_fields = ['$owner__username']
-	ordering_fields = ['owner__username']
+	search_fields = ['$username']
+	ordering_fields = ['username']
 
 	def get_throttles(self):
 		if self.action in ['update', 'partial_update', 'destroy']:
