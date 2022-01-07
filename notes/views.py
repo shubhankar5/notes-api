@@ -1,9 +1,9 @@
-from rest_framework import viewsets, permissions, filters, generics
+from rest_framework import viewsets, permissions, filters, versioning
 from rest_framework.throttling import AnonRateThrottle
 from django_filters import rest_framework as django_filters
 from django.contrib.auth.models import User
 from .models import Note
-from .serializers import UserSerializer, NoteSerializer, MyNoteSerializer
+from .serializers import UserSerializer, NoteSerializer, MyNoteSerializer, NoteHyperlinkedSerializer
 from .throttlers import GetRateThrottle, PostRateThrottle
 from .paginators import UserResultsSetPagination, NoteResultsSetPagination
 from .filters import NoteFilter
@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
 		return super().get_throttles()
 
 
-class NoteViewSet(viewsets.ModelViewSet):
+class BaseNoteViewSet(viewsets.ModelViewSet):
 	queryset = Note.objects.all()
 	serializer_class = NoteSerializer
 	permission_classes = [permissions.IsAdminUser]
@@ -48,7 +48,16 @@ class NoteViewSet(viewsets.ModelViewSet):
 		return super().get_throttles()
 
 
-class MyNoteViewSet(NoteViewSet):
+class NoteViewSet(BaseNoteViewSet):
+	versioning_class = versioning.QueryParameterVersioning
+
+	def get_serializer_class(self):
+	    if self.request.version == '0.1':
+	        return NoteHyperlinkedSerializer
+	    return NoteSerializer
+
+
+class MyNoteViewSet(BaseNoteViewSet):
 	serializer_class = MyNoteSerializer
 	permission_classes = [permissions.IsAuthenticated]
 
