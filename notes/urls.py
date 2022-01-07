@@ -5,7 +5,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
-router.register(r'all-notes', views.NoteViewSet, basename='all')
-router.register(r'my-notes', views.MyNoteViewSet, basename='my')
+router.register(r'all-notes', views.NoteViewSet, basename='all-note')
+router.register(r'my-notes', views.MyNoteViewSet, basename='my-note')
 
 urlpatterns = router.urls
