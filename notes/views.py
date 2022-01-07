@@ -3,7 +3,7 @@ from rest_framework.throttling import AnonRateThrottle
 from django_filters import rest_framework as django_filters
 from django.contrib.auth.models import User
 from .models import Note
-from .serializers import UserSerializer, NoteSerializer
+from .serializers import UserSerializer, NoteSerializer, MyNoteSerializer
 from .throttlers import GetRateThrottle, PostRateThrottle
 from .paginators import UserResultsSetPagination, NoteResultsSetPagination
 from .filters import NoteFilter
@@ -31,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class NoteViewSet(viewsets.ModelViewSet):
 	queryset = Note.objects.all()
 	serializer_class = NoteSerializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	permission_classes = [permissions.IsAdminUser]
 	throttle_classes = [AnonRateThrottle]
 	pagination_class = NoteResultsSetPagination
 	filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -49,5 +49,14 @@ class NoteViewSet(viewsets.ModelViewSet):
 
 
 class MyNoteViewSet(NoteViewSet):
+	serializer_class = MyNoteSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
 	def get_queryset(self):
 	    return self.request.user.notes.all()
+
+	def perform_create(self, serializer):
+		serializer.save(owner = self.request.user)
+
+	def perform_update(self, serializer):
+		serializer.save(owner = self.request.user)

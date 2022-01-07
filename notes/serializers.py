@@ -30,3 +30,9 @@ class NoteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Note
 		fields = '__all__'
+
+
+class MyNoteSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Note
+		exclude = ['owner']
