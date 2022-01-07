@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 from .models import Note
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = User
-		fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'is_staff']
+		fields = ['url', 'id', 'username', 'first_name', 'last_name', 'email', 'password', 'is_staff']
 
 	def create(self, validated_data):
 		password = validated_data.pop('password', None)
