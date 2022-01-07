@@ -9,16 +9,15 @@ from .paginators import UserResultsSetPagination, NoteResultsSetPagination
 from .filters import NoteFilter
 
 
-class NoteViewSet(viewsets.ModelViewSet):
-	queryset = Note.objects.all()
-	serializer_class = NoteSerializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class UserViewSet(viewsets.ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = UserSerializer
+	permission_classes = [permissions.IsAdminUser]
 	throttle_classes = [AnonRateThrottle]
-	pagination_class = NoteResultsSetPagination
-	filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-	filterset_class = NoteFilter
-	search_fields = ['$title', '=owner__username']
-	ordering_fields = ['title', 'owner__username', 'created_on']
+	pagination_class = UserResultsSetPagination
+	filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+	search_fields = ['$username']
+	ordering_fields = ['username']
 
 	def get_throttles(self):
 		if self.action in ['update', 'partial_update', 'destroy']:
@@ -29,15 +28,16 @@ class NoteViewSet(viewsets.ModelViewSet):
 		return super().get_throttles()
 
 
-class UserViewSet(viewsets.ModelViewSet):
-	queryset = User.objects.all()
-	serializer_class = UserSerializer
-	permission_classes = [permissions.IsAdminUser]
+class NoteViewSet(viewsets.ModelViewSet):
+	queryset = Note.objects.all()
+	serializer_class = NoteSerializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	throttle_classes = [AnonRateThrottle]
-	pagination_class = UserResultsSetPagination
-	filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-	search_fields = ['$username']
-	ordering_fields = ['username']
+	pagination_class = NoteResultsSetPagination
+	filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+	filterset_class = NoteFilter
+	search_fields = ['$title', '=owner__username']
+	ordering_fields = ['title', 'owner__username', 'created_on']
 
 	def get_throttles(self):
 		if self.action in ['update', 'partial_update', 'destroy']:
